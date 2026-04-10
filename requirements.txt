@@ -1,0 +1,6 @@
+pandas
+pydantic
+firecrawl-py
+google-genai
+python-dotenv
+tabulate

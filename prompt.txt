@@ -1,0 +1,85 @@
+I am a GTM engineer at Sonar, evidence backed data privacy and compliance for professional service businesses.
+I need to build a prompt-driven system that will classify a list of 100 inbound companies to see how well they fit the Sonar ICP. The system should also work the same and process 10,000 list items if requested. It must be scalable.
+
+I will provide you with prompts to build this system in the following stages:
+1. System outcomes that I need to achieve, environment setup (I will be in a virtual environment) including files like requirements.txt, API verification, and necessary resources
+2. Function implementation to gather the information needed for the outputs
+3. Functions to format the information needed for the output
+4. Testing output organization and information accuracy
+
+I will begin with stage 1, which is this prompt, and review your responses for clarity and accuracy. This system should be built in the inbound-icp-classification directory and only reference files in this directory.
+
+The three ways that these 100 inbound companies will be classified are: 1. firm type, 2. ICP fit, and 3. estimated number of users (browser seats / staff) at the firm.
+
+Definitions and further context for the classification terms above can be found in the sonar-icp-deep-research.txt file. 
+
+
+The output of this prompt driven system should be an eight column CSV file with rows for all 100 companiesthe following this format:
+
+- One individual inbound company per row
+
+- Columns for each row:
+
+1. Company Name (company_name)
+
+2. Company domain (company_domain)
+
+3. Professional service firm type "Law / Financial / Healthcare / Accounting / Creative" (firm_type)
+
+4. A short reason why they are classified as the firm type (firm_reason)
+
+5. "Strong Fit" / "Weak Fit" / "Not a Fit" for our ICP (icp_fit)
+
+6. A short reason why they are classified as the ICP fit in column 6 (icp_reason)
+
+7. # of estimated users at the firm (firm_user_estimate)
+
+8. Reasoning behind the estimated number of users in column 8 (firm_user_estimate_reason)
+
+
+The system should leverage the following tools and files to accomplish the output above and scalability:
+
+python for logic
+pandas and pydantic for data
+firecrawl API for web scraping company websites (found in .env)
+Google Gemini API (found in .env) for professional service firm type, ICP classification, and number of users at the firm
+Inbound companies list (raw-inbound-companies.txt)
+Sonar ICP research (sonar-icp-deep-research.txt)
+
+
+The main.py python script should have the following functions and capablilities, and should do the following for each company:
+
+1.  setup_env()
+    Imports, api key validation from .env
+    Read the raw, copy and pasted list of inbound company names and domains (raw-inbound-companies.txt), convert them to a correct CSV format (pay attention to commas in the names and be sure to add quotes to avoid incorrect parsing), and write them to inbound-companies.csv
+
+2.  scrape_website(domain)
+    
+    if the company is already found in the classified companies csv, skip it before triggering the api
+    if the website is not active, cannot be found, or is an invalid link, flag it by adding an "*" when writing the domain to the csv output, use the Google Search feature of the Gemini SDK, and call a helper function called google_search to gain context (200 words) about the company before classifying it. this information should be used instead of the firecrawl web scrape. these items should also be flagged for human review following the system's completion.
+    for all valid websites, scrape each company website using firecrawl API, specifcally FirecrawlApp.scrape(), and get text from the company's home page, 
+
+3.  classify_company(scraped_text)
+    Passes the scraped text from the company's web page(s) to Gemini API
+    Sends system prompt with context from Sonar ICP research (sonar-icp-deep-research.txt) to Gemini to make accurate decision on how inbound company should be classified
+    returns classification information formatted as the following:
+    - company_name: Str
+    - company_domain: Str
+    - firm_type: Str ("Law" "Financial" "Healthcare" "Accounting" "Creative", only five options, anything else returns an error)
+    - firm_reason: Str (15 words or less)
+    - icp_fit: Str ("Strong" OR "Weak" OR "Not a fit", only three options, anything else returns an error)
+    - icp_reason: Str (15 words or less)
+    - firm_user_estimate: Int or 0
+    - firm_user_estimate_reason: Str (15 words or less)
+
+4.  append_csv()
+    writes one row to the CSV output file (classified-companies.csv) before going to the next, ensuring that the classification is completed on a company by company basis
+
+5.  main()
+
+Handle errors appropriately for each of these functions. I want to know if the APIs are not working correctly, if firecrawl is not returning scraped text, if gemini is not receiving that text, if the company domain is not reachable, if the searched company is already in the classified companies csv file, and other transparent logging like this.
+
+Print a statement sharing how many of the rows were correctly classified, and which were not able to be classified.
+Print a well formatted table visual to the terminal of the first 15 classified companies and the 8 corresponding columns with the updated information.
+
+
