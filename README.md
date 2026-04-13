@@ -1,10 +1,10 @@
-# Inbound ICP classification (Sonar)
+# Inbound ICP Classification
 
 A small Python pipeline that turns a raw list of inbound companies into a scored, CRM-ready CSV. Each company is scraped (or researched via Gemini when the site fails), then classified with **Gemini** using **Sonar ICP context** from `sonar-icp-deep-research.txt`.
 
 ## Why it matters
 
-Inbound lists are noisy. Mixed industries, wrong domains, and no consistent read on fit. Sales and GTM ops waste cycles opening sites and debating “is this us?” This system applies one rubric at scale so routing, prioritization, and follow-up start from the same evidence.
+Inbound lists are noisy. Mixed industries, wrong domains, and no consistent read on fit. Sales and GTM ops waste cycles opening sites and debating “is this us?” and "is this lead worth reaching out to?" This system applies one rubric at scale so routing, prioritization, and follow-up start from the same evidence.
 
 ## Outcome for sales & GTM
 
@@ -18,13 +18,13 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the flow diagram.
 
 ## Tech stack
 
-| Layer | Choice |
-|--------|--------|
-| Runtime | Python |
-| Data | pandas, pydantic |
-| Scrape | Firecrawl |
-| Classification | Google Gemini (`google-genai`) |
-| Context | `sonar-icp-deep-research.txt` |
+| Layer           | Choice
+|-----------------|-----------------------------------
+| Runtime         | Python
+| Data            | pandas, pydantic
+| Scrape          | Firecrawl 
+| Classification  | Google Gemini (`google-genai`)
+| Context         | `sonar-icp-deep-research.txt`
 
 ## Quick start
 
@@ -36,12 +36,13 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Optional: `python verify_apis.py` to sanity-check keys.
+Optional: `python verify_apis.py` to check keys.
 
 ## Inputs / outputs
 
-| File | Role |
-|-----------------------------|------------------------------------------------------|
-| `raw-inbound-companies.txt` | Alternating company name / domain lines copied from a table in Google Docs|
-| `inbound-companies.csv`     | Generated clean list using raw-inbound-companies.txt |
-| `classified-companies.csv`  | One row per classified company                       |
+| File                        | Role
+|-----------------------------|---------------------------------------------------------------------------------
+| `prompt.txt`                | Prompt used to direct development in Cursor, demonstrating thinking and logic
+| `raw-inbound-companies.txt` | Alternating company name / domain lines copied from a table in Google Docs
+| `inbound-companies.csv`     | Generated clean list using raw-inbound-companies.txt
+| `classified-companies.csv`  | One row per classified company
